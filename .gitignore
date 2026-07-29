@@ -1,0 +1,32 @@
+# ── Environment files (CRITICAL: Contains secrets) ──
+.env
+.env.*
+.env.local
+
+!.env.example
+
+# ── Dependencies ──
+node_modules/
+
+# ── Build outputs ──
+
+
+# ── Debug/diagnostic files ──
+.dbg/
+*.log
+CRASH_REPORT.txt
+crash_report.txt
+vite_log.txt
+vite_err.txt
+debug_output*.txt
+debug_error.txt
+
+# ── Uploads (user-generated content) ──
+uploads/
+
+
+
+
+# ── Backup files ──
+*.bak
+backups/

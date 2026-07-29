@@ -1,0 +1,568 @@
+/**
+ * @fileoverview SettingsPage component.
+ * Provides functionality for SettingsPage.
+ */
+
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { api } from "api/client";
+import { toast } from "react-toastify";
+import NotificationSettings from "./notifications/NotificationSettings.jsx";
+
+const TABS = [
+  { key: "general", label: "General" },
+  { key: "notifications", label: "Notifications" },
+  { key: "templates", label: "Templates" },
+  { key: "departments", label: "Departments" },
+];
+
+/**
+ *  component
+ * 
+ * @returns {JSX.Element} The rendered component
+ */
+export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState("general");
+  const [pushEnabled, setPushEnabled] = useState(() => {
+    try {
+      const raw = localStorage.getItem("push_enabled");
+      if (raw === null) return true;
+      return String(raw) === "1";
+    } catch { return true; }
+  });
+  const [permissionStatus, setPermissionStatus] = useState(() => {
+    try {
+      if (typeof window !== "undefined" && "Notification" in window) {
+        return String(window.Notification.permission || "default");
+      }
+    } catch {}
+    return "default";
+  });
+  const [cloud, setCloud] = useState({ cloud_name: "", api_key: "", api_secret: "", folder: "", has_secret: false });
+  const [cloudLoading, setCloudLoading] = useState(false);
+  const [cloudSaving, setCloudSaving] = useState(false);
+  const [emailTestTo, setEmailTestTo] = useState("");
+  const [emailTesting, setEmailTesting] = useState(false);
+  const [loginBackgroundUrl, setLoginBackgroundUrl] = useState("");
+  const [loginBackgroundVersion, setLoginBackgroundVersion] = useState("");
+  const [loginBackgroundSaving, setLoginBackgroundSaving] = useState(false);
+  const [inactivityTimeout, setInactivityTimeout] = useState(() => {
+    try {
+      if (typeof localStorage !== "undefined") {
+        const val = localStorage.getItem("omnisuite.inactivityTimeout");
+        if (val !== null) return val;
+      }
+    } catch {}
+    return "60";
+  });
+
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined" && "Notification" in window) {
+        setPermissionStatus(String(window.Notification.permission || "default"));
+      }
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem("push_enabled", pushEnabled ? "1" : "0"); } catch {}
+  }, [pushEnabled]);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setCloudLoading(true);
+        const res = await api.get("/admin/settings/cloudinary");
+        const d = res?.data?.data || {};
+        if (!mounted) return;
+        setCloud(p => ({ ...p, cloud_name: d.cloud_name || "", api_key: d.api_key || "", folder: d.folder || "", has_secret: !!d.has_secret }));
+      } catch {} finally { if (mounted) setCloudLoading(false); }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  async function saveCloudinary() {
+    try {
+      setCloudSaving(true);
+      await api.post("/admin/settings/cloudinary", {
+        cloud_name: cloud.cloud_name, api_key: cloud.api_key,
+        api_secret: cloud.api_secret || undefined, folder: cloud.folder || undefined,
+      });
+      toast.success("Cloudinary settings saved");
+      setCloud(p => ({ ...p, has_secret: true, api_secret: "" }));
+    } catch (e) {
+      toast.error(e?.response?.data?.message || e?.message || "Failed to save settings");
+    } finally { setCloudSaving(false); }
+  }
+
+  async function sendTestEmail() {
+    try {
+      setEmailTesting(true);
+      const res = await api.post("/admin/email/test", { to: emailTestTo || undefined });
+      const configured = !!res?.data?.configured;
+      const sent = !!res?.data?.sent;
+      if (!configured) toast.error("Mailer not configured");
+      else if (sent) toast.success("Test email sent");
+      else toast.error("Mailer configured but send failed");
+    } catch { toast.error("Failed to send test email"); }
+    finally { setEmailTesting(false); }
+  }
+
+  async function loadLoginBackgroundMeta() {
+    try {
+      const res = await api.get("/admin/settings/login-background/meta");
+      const hasBackground = !!res?.data?.hasBackground;
+      const version = res?.data?.updatedAt || Date.now();
+      setLoginBackgroundVersion(String(version || ""));
+      setLoginBackgroundUrl(hasBackground ? `/api/admin/settings/login-background?v=${encodeURIComponent(String(version))}` : "");
+    } catch {
+      setLoginBackgroundUrl("");
+      setLoginBackgroundVersion("");
+    }
+  }
+
+  useEffect(() => { loadLoginBackgroundMeta(); }, []);
+
+  async function uploadLoginBackground(file) {
+    if (!file) return;
+    try {
+      setLoginBackgroundSaving(true);
+      let uploadFile = file;
+      if (file.size > 300 * 1024) {
+        const compressed = await new Promise((resolve) => {
+          const img = new Image();
+          const url = URL.createObjectURL(file);
+          img.onload = () => {
+            URL.revokeObjectURL(url);
+            let w = img.naturalWidth, h = img.naturalHeight;
+            const maxDim = 1920;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = (h / w) * maxDim; w = maxDim; }
+              else { w = (w / h) * maxDim; h = maxDim; }
+            }
+            const c = document.createElement("canvas");
+            c.width = w; c.height = h;
+            const ctx = c.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            c.toBlob(blob => resolve(blob), "image/jpeg", 0.8);
+          };
+          img.src = url;
+        });
+        uploadFile = new File([compressed], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" });
+      }
+      const fd = new FormData();
+      fd.append("background", uploadFile);
+      await api.post("/admin/settings/login-background", fd, { headers: { "Content-Type": "multipart/form-data" } });
+      toast.success("Login background updated");
+      await loadLoginBackgroundMeta();
+    } catch (e) {
+      toast.error(e?.response?.data?.message || e?.message || "Failed to update login background");
+    } finally { setLoginBackgroundSaving(false); }
+  }
+
+  async function clearLoginBackground() {
+    try {
+      setLoginBackgroundSaving(true);
+      await api.delete("/admin/settings/login-background");
+      setLoginBackgroundUrl("");
+      setLoginBackgroundVersion("");
+      toast.success("Login background reset");
+    } catch (e) {
+      toast.error(e?.response?.data?.message || e?.message || "Failed to reset login background");
+    } finally { setLoginBackgroundSaving(false); }
+  }
+
+  async function requestPushPermission() {
+    try {
+      if (typeof window === "undefined" || !("Notification" in window)) return;
+      const res = await window.Notification.requestPermission();
+      setPermissionStatus(String(res || "default"));
+      toast[res === "granted" ? "success" : "info"](res === "granted" ? "Notifications enabled" : "Notifications permission denied or dismissed");
+    } catch {}
+  }
+
+  async function subscribePushNow() {
+    try {
+      if (typeof window === "undefined") return;
+      if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) return;
+      if (window.Notification.permission !== "granted") { toast.info("Grant notification permission first"); return; }
+      const reg = await navigator.serviceWorker.ready;
+      const res = await api.get("/push/public-key");
+      const publicKey = String(res.data?.publicKey || "");
+      if (!publicKey) { toast.error("Missing VAPID public key"); return; }
+      function urlBase64ToUint8Array(base64String) {
+        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+        return outputArray;
+      }
+      const applicationServerKey = urlBase64ToUint8Array(publicKey);
+      const existing = await reg.pushManager.getSubscription();
+      if (existing && existing.endpoint) {
+        await api.post("/push/subscribe", { subscription: existing.toJSON() });
+        toast.success("Push subscription saved"); return;
+      }
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
+      await api.post("/push/subscribe", { subscription: sub.toJSON() });
+      toast.success("Subscribed to push notifications");
+    } catch { toast.error("Failed to subscribe"); }
+  }
+
+  async function unsubscribePushNow() {
+    try {
+      if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+      const reg = await navigator.serviceWorker.ready;
+      const existing = await reg.pushManager.getSubscription();
+      if (existing && existing.endpoint) {
+        try { await api.delete("/push/unsubscribe", { data: { subscription: existing.toJSON() } }); } catch {}
+        try { await existing.unsubscribe(); } catch {}
+        toast.success("Unsubscribed");
+      } else toast.info("No active subscription");
+    } catch { toast.error("Failed to unsubscribe"); }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="card">
+        <div className="card-header bg-brand text-white rounded-t-lg">
+          <div className="flex justify-between items-center text-white">
+            <div>
+              <h1 className="text-2xl font-bold dark:text-brand-300">Administration Settings</h1>
+              <p className="text-sm mt-1">Notifications, branding, and document setup</p>
+            </div>
+            <Link to="/administration" className="btn btn-secondary">Return to Menu</Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex border-b mb-4 overflow-x-auto">
+        {TABS.map(tab => (
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 text-sm font-medium capitalize whitespace-nowrap ${activeTab === tab.key ? "border-b-2 border-brand text-brand" : "text-slate-500 hover:text-slate-700"}`}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "general" && (
+        <div className="space-y-4">
+          <div className="card">
+            <div className="card-body space-y-3">
+              <div className="flex justify-between items-start gap-4">
+                <div>
+                  <div className="text-lg font-semibold">Login Background</div>
+                  <div className="text-sm text-slate-500">Change the image shown behind the login form.</div>
+                </div>
+                {loginBackgroundUrl ? (
+                  <div className="w-40 h-24 rounded border border-slate-200 bg-cover bg-center" style={{ backgroundImage: `url(${loginBackgroundUrl})` }} />
+                ) : (
+                  <div className="w-40 h-24 rounded border border-dashed border-slate-300 flex items-center justify-center text-xs text-slate-500">Default image</div>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <label className="btn-primary cursor-pointer">
+                  {loginBackgroundSaving ? "Saving..." : "Upload Background"}
+                  <input type="file" accept="image/*" className="hidden" disabled={loginBackgroundSaving} onChange={e => { const file = e.target.files?.[0] || null; e.target.value = ""; uploadLoginBackground(file); }} />
+                </label>
+                <button type="button" className="btn-outline" disabled={loginBackgroundSaving || !loginBackgroundUrl} onClick={clearLoginBackground}>Reset to Default</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {activeTab === "notifications" && (
+        <div className="space-y-4">
+          <div className="card">
+            <div className="card-body space-y-3">
+              <div className="flex justify-between items-center">
+                <div>
+                  <div className="text-lg font-semibold">Push Notifications</div>
+                  <div className="text-sm text-slate-500">Permission: {permissionStatus}</div>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-sm">Enabled</span>
+                  <input type="checkbox" className="toggle" checked={pushEnabled} onChange={e => setPushEnabled(e.target.checked)} />
+                </label>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex flex-col gap-1 w-1/3">
+                  <button type="button" className="btn-secondary" onClick={requestPushPermission}>Request Permission</button>
+                </div>
+                <div className="flex flex-col gap-1 w-1/3">
+                  <button type="button" className="btn-primary" onClick={subscribePushNow} disabled={!pushEnabled}>Subscribe Now</button>
+                </div>
+                <div className="flex flex-col gap-1 w-1/3">
+                  <button type="button" className="btn-outline" onClick={unsubscribePushNow}>Unsubscribe</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-body p-0">
+              <NotificationSettings />
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-body space-y-3">
+              <div className="text-lg font-semibold">Low Stock Notifications</div>
+              <div className="text-sm text-slate-500">Configure how users receive low stock alerts</div>
+              <LowStockNotificationSection />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "templates" && (
+        <div className="card">
+          <div className="card-body space-y-3">
+            <div className="text-lg font-semibold">Document Templates</div>
+            <div className="text-sm text-slate-500">Manage print and PDF templates for Sales Order, Invoice, and more.</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Link to="/administration/settings/templates?type=general-template" className="btn-outline">Report Header</Link>
+              <Link to="/administration/settings/templates?type=sales-order" className="btn-outline">Sales Order</Link>
+              <Link to="/administration/settings/templates?type=invoice" className="btn-outline">Invoice</Link>
+              <Link to="/administration/settings/templates?type=delivery-note" className="btn-outline">Delivery Note</Link>
+              <Link to="/administration/settings/templates?type=payment-voucher" className="btn-outline">Payment Voucher</Link>
+              <Link to="/administration/settings/templates?type=salary-slip" className="btn-outline">Salary Slip</Link>
+              <Link to="/administration/settings/templates?type=receipt-voucher" className="btn-outline">Receipt Voucher</Link>
+              <Link to="/administration/settings/templates?type=quotation" className="btn-outline">Quotation</Link>
+              <Link to="/administration/settings/templates?type=purchase-order" className="btn-outline">Purchase Order</Link>
+              <Link to="/administration/settings/templates?type=grn" className="btn-outline">GRN</Link>
+              <Link to="/administration/settings/templates?type=purchase-bill" className="btn-outline">Purchase Bill</Link>
+              <Link to="/administration/settings/templates?type=direct-purchase" className="btn-outline">Direct Purchase</Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "departments" && <DepartmentsSection />}
+      
+    </div>
+  );
+}
+
+function LowStockNotificationSection() {
+  const [users, setUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [emailEnabled, setEmailEnabled] = useState(false);
+  const [smsEnabled, setSmsEnabled] = useState(false);
+  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await api.get("/admin/users");
+        const items = res?.data?.data?.items || res?.data?.items || [];
+        setUsers(items);
+      } catch {}
+    }
+    load();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedUserId) return;
+    async function loadPref() {
+      try {
+        setLoading(true);
+        const res = await api.get(`/access/notification-prefs?key=low-stock&user_id=${selectedUserId}`);
+        const item = res?.data?.item || null;
+        setPushEnabled(Boolean(item?.push_enabled));
+        setEmailEnabled(Boolean(item?.email_enabled));
+        setSmsEnabled(Boolean(item?.sms_enabled));
+        setWhatsappEnabled(Boolean(item?.whatsapp_enabled));
+      } catch { 
+        setPushEnabled(false); 
+        setEmailEnabled(false); 
+        setSmsEnabled(false); 
+        setWhatsappEnabled(false); 
+      }
+      finally { setLoading(false); }
+    }
+    loadPref();
+  }, [selectedUserId]);
+
+  async function save() {
+    if (!selectedUserId) return;
+    try {
+      setSaving(true);
+      await api.put(`/access/notification-prefs/low-stock`, { 
+        user_id: Number(selectedUserId), 
+        push_enabled: pushEnabled ? 1 : 0, 
+        email_enabled: emailEnabled ? 1 : 0,
+        sms_enabled: smsEnabled ? 1 : 0,
+        whatsapp_enabled: whatsappEnabled ? 1 : 0
+      });
+    } catch {}
+    setSaving(false);
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-2">
+        <select className="input flex-1" value={selectedUserId} onChange={e => setSelectedUserId(e.target.value)}>
+          <option value="">Select a user...</option>
+          {users.map(u => (
+            <option key={u.id} value={u.id}>{u.first_name} {u.last_name} ({u.email})</option>
+          ))}
+        </select>
+      </div>
+
+      {selectedUserId && (
+        <>
+          {loading ? (
+            <div className="text-sm text-slate-500 py-2">Loading...</div>
+          ) : (
+            <div className="space-y-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="toggle toggle-sm" checked={pushEnabled} onChange={e => setPushEnabled(e.target.checked)} />
+                <span className="text-sm">In-App Push</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="toggle toggle-sm" checked={emailEnabled} onChange={e => setEmailEnabled(e.target.checked)} />
+                <span className="text-sm">Email</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="toggle toggle-sm" checked={smsEnabled} onChange={e => setSmsEnabled(e.target.checked)} />
+                <span className="text-sm">SMS</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="toggle toggle-sm" checked={whatsappEnabled} onChange={e => setWhatsappEnabled(e.target.checked)} />
+                <span className="text-sm">WhatsApp</span>
+              </label>
+              <div className="pt-2">
+                <button className="btn-primary w-full" onClick={save} disabled={saving}>
+                  {saving ? "Saving..." : "Save Preferences"}
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function DepartmentsSection() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ name: "", code: "", is_active: 1 });
+  const [editingId, setEditingId] = useState(null);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/admin/departments");
+      setItems(Array.isArray(res.data?.items) ? res.data.items : []);
+    } catch { toast.error("Failed to load departments"); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { loadData(); }, []);
+
+  const resetForm = () => { setForm({ name: "", code: "", is_active: 1 }); setEditingId(null); };
+
+  const handleSubmit = async () => {
+    if (!form.name.trim() || !form.code.trim()) { toast.error("Name and Code are required"); return; }
+    setSaving(true);
+    try {
+      if (editingId) {
+        await api.put(`/admin/departments/${editingId}`, form);
+        toast.success("Department updated");
+      } else {
+        await api.post("/admin/departments", form);
+        toast.success("Department created");
+      }
+      resetForm();
+      loadData();
+    } catch (e) { toast.error(e?.response?.data?.message || "Failed to save"); }
+    finally { setSaving(false); }
+  };
+
+  const handleEdit = (item) => {
+    setForm({ name: item.name, code: item.code, is_active: item.is_active });
+    setEditingId(item.id);
+  };
+
+  const handleCancel = () => resetForm();
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-1">
+        <div className="card p-4">
+          <h3 className="font-medium mb-4">{editingId ? "Edit Department" : "Add Department"}</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm mb-1">Name</label>
+              <input className="input w-full" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Code</label>
+              <input className="input w-full" value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value }))} />
+            </div>
+            <div>
+              <label className="flex items-center gap-2">
+                <input type="checkbox" className="checkbox" checked={form.is_active === 1 || form.is_active === true} onChange={e => setForm(p => ({ ...p, is_active: e.target.checked ? 1 : 0 }))} />
+                <span className="text-sm">Active</span>
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn-primary" disabled={saving} onClick={handleSubmit}>
+                {saving ? "Saving..." : editingId ? "Update" : "Create"}
+              </button>
+              {editingId && (
+                <button className="btn-outline" onClick={handleCancel}>Cancel</button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="lg:col-span-2">
+        <div className="card">
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-slate-50">
+                <tr className="text-left text-xs font-bold text-slate-500 uppercase">
+                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">Code</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan={4} className="px-4 py-8 text-center text-slate-500">Loading...</td></tr>
+                ) : items.length > 0 ? items.map(item => (
+                  <tr key={item.id} className="border-t hover:bg-slate-50">
+                    <td className="px-4 py-3 font-medium">{item.name}</td>
+                    <td className="px-4 py-3 text-sm text-slate-500">{item.code}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${item.is_active ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-600"}`}>
+                        {item.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button onClick={() => handleEdit(item)} className="text-brand hover:text-brand-700 text-sm font-medium">Edit</button>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr><td colSpan={4} className="px-4 py-8 text-center text-slate-500">No departments found.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
