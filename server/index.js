@@ -1052,6 +1052,7 @@ app.use("/", authRoutes);
 // Intercept Socket.io requests explicitly because Passenger intercepts the http.Server hook
 app.use("/socket.io", (req, res, next) => {
   if (ioInstance && ioInstance.engine) {
+    req.url = req.originalUrl; // Express strips the mount path, but engine.io needs it!
     ioInstance.engine.handleRequest(req, res);
   } else {
     // If socket.io is disabled, return 400 to tell the frontend client to stop polling
