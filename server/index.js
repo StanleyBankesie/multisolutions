@@ -1049,6 +1049,16 @@ apiPaths.forEach(({ path, router }) => {
 app.use("/api", authRoutes);
 app.use("/", authRoutes);
 
+// Intercept Socket.io requests explicitly because Passenger intercepts the http.Server hook
+app.use("/socket.io", (req, res, next) => {
+  if (ioInstance && ioInstance.engine) {
+    ioInstance.engine.handleRequest(req, res);
+  } else {
+    // If socket.io is disabled, return 400 to tell the frontend client to stop polling
+    res.status(400).json({ error: "Socket.io disabled by server" });
+  }
+});
+
 /* ---------------- STATIC FILES & SPA FALLBACK ---------------- */
 // Use the frontend path already discovered by the early static block above.
 // Also allow SERVE_FRONTEND / ENABLE_SPA to force-enable SPA fallback even if
