@@ -13,7 +13,6 @@ export const FEATURES_REGISTRY = {
       { feature_key: "administration:roles", type: "feature", label: "Role Setup", path: "/administration/access/roles" },
       { feature_key: "administration:user-permissions", type: "feature", label: "User Permissions", path: "/administration/access/user-permissions" },
       { feature_key: "administration:user-overrides", type: "feature", label: "Exceptional Permissions", path: "/administration/access/user-overrides" },
-      { feature_key: "administration:dashboard-permissions", type: "feature", label: "Dashboard Permissions", path: "/administration/access/dashboard-permissions" },
       { feature_key: "administration:users", type: "feature", label: "User Management", path: "/administration/users" },
       { feature_key: "administration:settings", type: "feature", label: "Settings", path: "/administration/settings" },
       { feature_key: "administration:diagnostics", type: "feature", label: "Diagnostics", path: "/administration/diagnostics" },
@@ -35,7 +34,28 @@ export const FEATURES_REGISTRY = {
       { feature_key: "sales:invoices", type: "feature", label: "Invoices", path: "/sales/invoices" },
       { feature_key: "sales:delivery", type: "feature", label: "Delivery Management", path: "/sales/delivery" },
       { feature_key: "sales:customers", type: "feature", label: "Customer Management", path: "/sales/customers" },
-      { feature_key: "sales:reports", type: "feature", label: "Sales Reports", path: "/sales/reports" },
+
+      { feature_key: "sales:accountsreceivableagingreport", type: "feature", label: " Accounts Receivable Aging Report", path: "/sales/reports/accountsreceivableagingreport" },
+      { feature_key: "sales:cancelledordersreport", type: "feature", label: " Cancelled Orders Report", path: "/sales/reports/cancelledordersreport" },
+      { feature_key: "sales:customerhistoryreport", type: "feature", label: " Customer History Report", path: "/sales/reports/customerhistoryreport" },
+      { feature_key: "sales:customerlistreport", type: "feature", label: " Customer List Report", path: "/sales/reports/customerlistreport" },
+      { feature_key: "sales:customerorderhistoryreport", type: "feature", label: " Customer Order History Report", path: "/sales/reports/customerorderhistoryreport" },
+      { feature_key: "sales:debtorsbalancereport", type: "feature", label: " Debtors Balance Report", path: "/sales/reports/debtorsbalancereport" },
+      { feature_key: "sales:deliveryregisterreport", type: "feature", label: " Delivery Register Report", path: "/sales/reports/deliveryregisterreport" },
+      { feature_key: "sales:discountutilizationreport", type: "feature", label: " Discount Utilization Report", path: "/sales/reports/discountutilizationreport" },
+      { feature_key: "sales:invoicesummaryreport", type: "feature", label: " Invoice Summary Report", path: "/sales/reports/invoicesummaryreport" },
+      { feature_key: "sales:monthlysalestrendreport", type: "feature", label: " Monthly Sales Trend Report", path: "/sales/reports/monthlysalestrendreport" },
+      { feature_key: "sales:pricelistreport", type: "feature", label: " Price List Report", path: "/sales/reports/pricelistreport" },
+      { feature_key: "sales:prospectivecustomerlistreport", type: "feature", label: " Prospective Customer List Report", path: "/sales/reports/prospectivecustomerlistreport" },
+      { feature_key: "sales:quotationconversionreport", type: "feature", label: " Quotation Conversion Report", path: "/sales/reports/quotationconversionreport" },
+      { feature_key: "sales:quotationsummaryreport", type: "feature", label: " Quotation Summary Report", path: "/sales/reports/quotationsummaryreport" },
+      { feature_key: "sales:revenuebycustomerreport", type: "feature", label: " Revenue By Customer Report", path: "/sales/reports/revenuebycustomerreport" },
+      { feature_key: "sales:revenuebyproductreport", type: "feature", label: " Revenue By Product Report", path: "/sales/reports/revenuebyproductreport" },
+      { feature_key: "sales:salesorderstatusreport", type: "feature", label: " Sales Order Status Report", path: "/sales/reports/salesorderstatusreport" },
+      { feature_key: "sales:salesprofitabilityreport", type: "feature", label: " Sales Profitability Report", path: "/sales/reports/salesprofitabilityreport" },
+      { feature_key: "sales:salesregisterreport", type: "feature", label: " Sales Register Report", path: "/sales/reports/salesregisterreport" },
+      { feature_key: "sales:salesreturnreport", type: "feature", label: " Sales Return Report", path: "/sales/reports/salesreturnreport" },
+      { feature_key: "sales:salestrackingreport", type: "feature", label: " Sales Tracking Report", path: "/sales/reports/salestrackingreport" },
       { feature_key: "sales:returns", type: "feature", label: "Sales Returns", path: "/sales/returns" },
       { feature_key: "sales:price-setup", type: "feature", label: "Price Setup", path: "/sales/price-setup" },
       { feature_key: "sales:discount-schemes", type: "feature", label: "Discount Schemes", path: "/sales/discount-schemes" },
@@ -45,9 +65,7 @@ export const FEATURES_REGISTRY = {
       { feature_key: "sales:prospect-conversion", type: "feature", label: "Prospect Conversion", path: "/sales/prospect-conversion" },
     ],
     dashboards: [
-      { feature_key: "sales:sales-overview", type: "dashboard", label: "Sales Overview Dashboard", path: "/sales/sales-overview" },
-      { feature_key: "sales:revenue-analytics", type: "dashboard", label: "Revenue Analytics Dashboard", path: "/sales/revenue-analytics" },
-      { feature_key: "sales:customer-analytics", type: "dashboard", label: "Customer Analytics Dashboard", path: "/sales/customer-analytics" },
+
     ],
   },
 
@@ -67,12 +85,29 @@ export const FEATURES_REGISTRY = {
       { feature_key: "purchase:purchase-bills-import", type: "feature", label: "Import Purchase Bills", path: "/purchase/purchase-bills-import" },
       { feature_key: "purchase:suppliers", type: "feature", label: "Suppliers", path: "/purchase/suppliers" },
       { feature_key: "purchase:purchase-returns", type: "feature", label: "Purchase Returns", path: "/purchase/purchase-returns" },
-      { feature_key: "purchase:reports", type: "feature", label: "Reports", path: "/purchase/reports" },
+
+      { feature_key: "purchase:cancelledpurchaseordersreport", type: "feature", label: " Cancelled Purchase Orders Report", path: "/purchase/reports/cancelledpurchaseordersreport" },
+      { feature_key: "purchase:departmentpurchaseanalysisreport", type: "feature", label: " Department Purchase Analysis Report", path: "/purchase/reports/departmentpurchaseanalysisreport" },
+      { feature_key: "purchase:importcostbreakdownreport", type: "feature", label: " Import Cost Breakdown Report", path: "/purchase/reports/importcostbreakdownreport" },
+      { feature_key: "purchase:importorderlistreport", type: "feature", label: " Import Order List Report", path: "/purchase/reports/importorderlistreport" },
+      { feature_key: "purchase:importordertrackingreport", type: "feature", label: " Import Order Tracking Report", path: "/purchase/reports/importordertrackingreport" },
+      { feature_key: "purchase:itempurchasehistoryreport", type: "feature", label: " Item Purchase History Report", path: "/purchase/reports/itempurchasehistoryreport" },
+      { feature_key: "purchase:leadtimeanalysisreport", type: "feature", label: " Lead Time Analysis Report", path: "/purchase/reports/leadtimeanalysisreport" },
+      { feature_key: "purchase:localordertrackingreport", type: "feature", label: " Local Order Tracking Report", path: "/purchase/reports/localordertrackingreport" },
+      { feature_key: "purchase:pendinggrntobillimportreport", type: "feature", label: " Pending Grn To Bill Import Report", path: "/purchase/reports/pendinggrntobillimportreport" },
+      { feature_key: "purchase:pendinggrntobilllocalreport", type: "feature", label: " Pending Grn To Bill Local Report", path: "/purchase/reports/pendinggrntobilllocalreport" },
+      { feature_key: "purchase:pendingshipmentdetailsreport", type: "feature", label: " Pending Shipment Details Report", path: "/purchase/reports/pendingshipmentdetailsreport" },
+      { feature_key: "purchase:pricevariancereport", type: "feature", label: " Price Variance Report", path: "/purchase/reports/pricevariancereport" },
+      { feature_key: "purchase:purchaseagingreport", type: "feature", label: " Purchase Aging Report", path: "/purchase/reports/purchaseagingreport" },
+      { feature_key: "purchase:purchaseregisterreport", type: "feature", label: " Purchase Register Report", path: "/purchase/reports/purchaseregisterreport" },
+      { feature_key: "purchase:purchasereturnsanalysisreport", type: "feature", label: " Purchase Returns Analysis Report", path: "/purchase/reports/purchasereturnsanalysisreport" },
+      { feature_key: "purchase:purchasetrackingreport", type: "feature", label: " Purchase Tracking Report", path: "/purchase/reports/purchasetrackingreport" },
+      { feature_key: "purchase:supplieroutstandingpayablesreport", type: "feature", label: " Supplier Outstanding Payables Report", path: "/purchase/reports/supplieroutstandingpayablesreport" },
+      { feature_key: "purchase:supplierperformancereport", type: "feature", label: " Supplier Performance Report", path: "/purchase/reports/supplierperformancereport" },
+      { feature_key: "purchase:supplierquotationanalysisreport", type: "feature", label: " Supplier Quotation Analysis Report", path: "/purchase/reports/supplierquotationanalysisreport" },
       { feature_key: "purchase:setup", type: "feature", label: "Purchase Setup", path: "/purchase/setup" },
     ],
     dashboards: [
-      { feature_key: "purchase:procurement-overview", type: "dashboard", label: "Procurement Overview Dashboard", path: "/purchase/procurement-overview" },
-      { feature_key: "purchase:supplier-analytics", type: "dashboard", label: "Supplier Analytics Dashboard", path: "/purchase/supplier-analytics" },
     ],
   },
 
@@ -97,11 +132,20 @@ export const FEATURES_REGISTRY = {
       { feature_key: "inventory:batches", type: "feature", label: "Item Batches Tracking", path: "/inventory/batches" },
       { feature_key: "inventory:stock-taking", type: "feature", label: "Stock Taking", path: "/inventory/stock-taking" },
       { feature_key: "inventory:stock-reorder", type: "feature", label: "Stock Reorder", path: "/inventory/stock-reorder" },
-      { feature_key: "inventory:reports", type: "feature", label: "Inventory Reports", path: "/inventory/reports" },
+
+      { feature_key: "inventory:fastmovingreport", type: "feature", label: " Fast Moving Report", path: "/inventory/reports/fastmovingreport" },
+      { feature_key: "inventory:issueregisterreport", type: "feature", label: " Issue Register Report", path: "/inventory/reports/issueregisterreport" },
+      { feature_key: "inventory:materialreturnreport", type: "feature", label: " Material Return Report", path: "/inventory/reports/materialreturnreport" },
+      { feature_key: "inventory:nonmovingreport", type: "feature", label: " Non Moving Report", path: "/inventory/reports/nonmovingreport" },
+      { feature_key: "inventory:slowmovingreport", type: "feature", label: " Slow Moving Report", path: "/inventory/reports/slowmovingreport" },
+      { feature_key: "inventory:stockadjustmentreport", type: "feature", label: " Stock Adjustment Report", path: "/inventory/reports/stockadjustmentreport" },
+      { feature_key: "inventory:stockaginganalysisreport", type: "feature", label: " Stock Aging Analysis Report", path: "/inventory/reports/stockaginganalysisreport" },
+      { feature_key: "inventory:stockbalancesreport", type: "feature", label: " Stock Balances Report", path: "/inventory/reports/stockbalancesreport" },
+      { feature_key: "inventory:stocktransferregisterreport", type: "feature", label: " Stock Transfer Register Report", path: "/inventory/reports/stocktransferregisterreport" },
+      { feature_key: "inventory:stockvaluereport", type: "feature", label: " Stock Value Report", path: "/inventory/reports/stockvaluereport" },
+      { feature_key: "inventory:stockverificationreport", type: "feature", label: " Stock Verification Report", path: "/inventory/reports/stockverificationreport" },
     ],
     dashboards: [
-      { feature_key: "inventory:inventory-overview", type: "dashboard", label: "Inventory Overview Dashboard", path: "/inventory/inventory-overview" },
-      { feature_key: "inventory:stock-analytics", type: "dashboard", label: "Stock Analytics Dashboard", path: "/inventory/stock-analytics" },
     ],
   },
 
@@ -127,12 +171,25 @@ export const FEATURES_REGISTRY = {
       { feature_key: "finance:fixed-assets", type: "feature", label: "Fixed Assets", path: "/finance/fixed-assets" },
       { feature_key: "finance:opening-balances", type: "feature", label: "Opening Balances", path: "/finance/opening-balances" },
       { feature_key: "finance:pdc-postings", type: "feature", label: "Post-Dated Cheques", path: "/finance/pdc-postings" },
-      { feature_key: "finance:reports", type: "feature", label: "Finance Reports", path: "/finance/reports" },
+
+      { feature_key: "finance:audittrailreport", type: "feature", label: " Audit Trail Report", path: "/finance/reports/audittrailreport" },
+      { feature_key: "finance:balancesheetreport", type: "feature", label: " Balance Sheet Report", path: "/finance/reports/balancesheetreport" },
+      { feature_key: "finance:cashflowreport", type: "feature", label: " Cash Flow Report", path: "/finance/reports/cashflowreport" },
+      { feature_key: "finance:chartofaccountsreport", type: "feature", label: " Chart Of Accounts Report", path: "/finance/reports/chartofaccountsreport" },
+      { feature_key: "finance:creditorsledgerreport", type: "feature", label: " Creditors Ledger Report", path: "/finance/reports/creditorsledgerreport" },
+      { feature_key: "finance:customeroutstandingreport", type: "feature", label: " Customer Outstanding Report", path: "/finance/reports/customeroutstandingreport" },
+      { feature_key: "finance:debtorsledgerreport", type: "feature", label: " Debtors Ledger Report", path: "/finance/reports/debtorsledgerreport" },
+      { feature_key: "finance:generalledgerreport", type: "feature", label: " General Ledger Report", path: "/finance/reports/generalledgerreport" },
+      { feature_key: "finance:journalreport", type: "feature", label: " Journal Report", path: "/finance/reports/journalreport" },
+      { feature_key: "finance:outstandingreceivablereport", type: "feature", label: " Outstanding Receivable Report", path: "/finance/reports/outstandingreceivablereport" },
+      { feature_key: "finance:paymentduereport", type: "feature", label: " Payment Due Report", path: "/finance/reports/paymentduereport" },
+      { feature_key: "finance:profitandlossreport", type: "feature", label: " Profit And Loss Report", path: "/finance/reports/profitandlossreport" },
+      { feature_key: "finance:ratioanalysisreport", type: "feature", label: " Ratio Analysis Report", path: "/finance/reports/ratioanalysisreport" },
+      { feature_key: "finance:supplieroutstandingreport", type: "feature", label: " Supplier Outstanding Report", path: "/finance/reports/supplieroutstandingreport" },
+      { feature_key: "finance:trialbalancereport", type: "feature", label: " Trial Balance Report", path: "/finance/reports/trialbalancereport" },
+      { feature_key: "finance:voucherregisterreport", type: "feature", label: " Voucher Register Report", path: "/finance/reports/voucherregisterreport" },
     ],
     dashboards: [
-      { feature_key: "finance:financial-overview", type: "dashboard", label: "Financial Overview Dashboard", path: "/finance/financial-overview" },
-      { feature_key: "finance:cash-flow", type: "dashboard", label: "Cash Flow Dashboard", path: "/finance/cash-flow" },
-      { feature_key: "finance:budget-analysis", type: "dashboard", label: "Budget Analysis Dashboard", path: "/finance/budget-analysis" },
     ],
   },
 
@@ -164,9 +221,9 @@ export const FEATURES_REGISTRY = {
       { feature_key: "human-resources:hr-reports", type: "feature", label: "HR Reports", path: "/human-resources/hr-reports" },
     ],
     dashboards: [
-      { feature_key: "human-resources:hr-overview", type: "dashboard", label: "HR Overview Dashboard", path: "/human-resources/hr-overview" },
-      { feature_key: "human-resources:attendance-dashboard", type: "dashboard", label: "Attendance Dashboard", path: "/human-resources/attendance-dashboard" },
-      { feature_key: "human-resources:payroll-dashboard", type: "dashboard", label: "Payroll Dashboard", path: "/human-resources/payroll-dashboard" },
+
+
+
     ],
   },
 
@@ -186,8 +243,6 @@ export const FEATURES_REGISTRY = {
       { feature_key: "maintenance:material-receipts", type: "feature", label: "Material Receipts", path: "/maintenance/material-receipts" },
     ],
     dashboards: [
-      { feature_key: "maintenance:maintenance-overview", type: "dashboard", label: "Maintenance Overview Dashboard", path: "/maintenance/maintenance-overview" },
-      { feature_key: "maintenance:asset-analytics", type: "dashboard", label: "Asset Analytics Dashboard", path: "/maintenance/asset-analytics" },
     ],
   },
 
@@ -199,12 +254,10 @@ export const FEATURES_REGISTRY = {
       { feature_key: "production:work-orders", type: "feature", label: "Work Orders", path: "/production/work-orders" },
       { feature_key: "production:production-planning", type: "feature", label: "Production Planning", path: "/production/production-planning" },
       { feature_key: "production:job-cards", type: "feature", label: "Job Cards", path: "/production/job-cards" },
-      { feature_key: "production:production-reports", type: "feature", label: "Production Reports", path: "/production/production-reports" },
+
       { feature_key: "production:setup", type: "feature", label: "Manufacturing Setup", path: "/production/setup" },
     ],
     dashboards: [
-      { feature_key: "production:production-overview", type: "dashboard", label: "Production Overview Dashboard", path: "/production/production-overview" },
-      { feature_key: "production:efficiency-analytics", type: "dashboard", label: "Efficiency Analytics Dashboard", path: "/production/efficiency-analytics" },
     ],
   },
 
@@ -229,8 +282,8 @@ export const FEATURES_REGISTRY = {
       { feature_key: "project-management:project-expense-report", type: "feature", label: "Project Expense Report", path: "/project-management/reports/project-expense" },
     ],
     dashboards: [
-      { feature_key: "project-management:project-overview", type: "dashboard", label: "Project Overview Dashboard", path: "/project-management/project-overview" },
-      { feature_key: "project-management:resource-utilization", type: "dashboard", label: "Resource Utilization Dashboard", path: "/project-management/resource-utilization" },
+
+
     ],
   },
 
@@ -244,42 +297,35 @@ export const FEATURES_REGISTRY = {
       { feature_key: "pos:post-to-finance", type: "feature", label: "Post to Finance", path: "/pos/post-to-finance" },
       { feature_key: "pos:returns", type: "feature", label: "POS Returns", path: "/pos/returns" },
       { feature_key: "pos:register", type: "feature", label: "POS Register", path: "/pos/register" },
-      { feature_key: "pos:reports", type: "feature", label: "POS Reports", path: "/pos/reports" },
-      { feature_key: "pos:dashboard", type: "feature", label: "POS Dashboard", path: "/pos/dashboard" },
+
+
       { feature_key: "pos:customer-history", type: "feature", label: "Customer Accounts", path: "/pos/customer-history" },
       { feature_key: "pos:on-hold", type: "feature", label: "On-Hold Sales", path: "/pos/holds" },
       { feature_key: "pos:reconciliation", type: "feature", label: "Sync Reconciliation", path: "/pos/reconciliation" },
       { feature_key: "pos:setup", type: "feature", label: "POS Setup", path: "/pos/setup" },
     ],
     dashboards: [
-      { feature_key: "pos:pos-overview", type: "dashboard", label: "POS Overview Dashboard", path: "/pos/pos-overview" },
-      { feature_key: "pos:sales-analytics", type: "dashboard", label: "Sales Analytics Dashboard", path: "/pos/sales-analytics" },
     ],
   },
 
   // Business Intelligence Module: Contains features for custom reports, dashboards, and analytics
   "business-intelligence": {
     features: [
-      { feature_key: "business-intelligence:dashboards", type: "feature", label: "Dashboard Management", path: "/business-intelligence/dashboards" },
       { feature_key: "business-intelligence:reports", type: "feature", label: "Custom Reports", path: "/business-intelligence/reports" },
       { feature_key: "business-intelligence:data-sources", type: "feature", label: "Data Sources", path: "/business-intelligence/data-sources" },
       { feature_key: "business-intelligence:analytics", type: "feature", label: "Analytics", path: "/business-intelligence/analytics" },
       { feature_key: "business-intelligence:bi-reports", type: "feature", label: "BI Reports", path: "/business-intelligence/bi-reports" },
     ],
     dashboards: [
-      { feature_key: "business-intelligence:bi-overview", type: "dashboard", label: "BI Overview Dashboard", path: "/business-intelligence/bi-overview" },
-      { feature_key: "business-intelligence:executive-dashboard", type: "dashboard", label: "Executive Dashboard", path: "/business-intelligence/executive-dashboard" },
     ],
   },
 
   // Executive Overview Module: Contains features for high-level KPIs and executive dashboards
   "executive-overview": {
     features: [
-      { feature_key: "executive-overview:dashboard", type: "feature", label: "Executive Dashboard", path: "/executive-overview/dashboard" },
       { feature_key: "executive-overview:kpi-reports", type: "feature", label: "KPI Reports", path: "/executive-overview/kpi-reports" },
     ],
     dashboards: [
-      { feature_key: "executive-overview:executive-dashboard", type: "dashboard", label: "Executive Dashboard", path: "/executive-overview/executive-dashboard" },
     ],
   },
 
@@ -300,8 +346,8 @@ export const FEATURES_REGISTRY = {
       { feature_key: "service-management:setup", type: "feature", label: "Service Setup", path: "/service-management/setup" },
     ],
     dashboards: [
-      { feature_key: "service-management:service-overview", type: "dashboard", label: "Service Overview Dashboard", path: "/service-management/service-overview" },
-      { feature_key: "service-management:billing-analytics", type: "dashboard", label: "Billing Analytics Dashboard", path: "/service-management/billing-analytics" },
+
+
     ],
   },
   
@@ -325,7 +371,6 @@ export const FEATURES_REGISTRY = {
       { feature_key: "transport:reports", type: "feature", label: "Reports & Analytics", path: "/transport/reports" }
     ],
     dashboards: [
-      { feature_key: "transport:overview", type: "dashboard", label: "Transport Overview Dashboard", path: "/transport/overview" }
     ],
   },
 };

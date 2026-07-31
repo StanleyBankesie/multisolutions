@@ -60,7 +60,7 @@ export default function PaymentPackages() {
 
   const fetchPackages = async () => {
     try {
-      const res = await api.get("/payment-packages").catch(() => null);
+      const res = await api.get("/subscription-plans").catch(() => null);
       if (res && res.data && Array.isArray(res.data)) {
         setPackages(res.data);
       }
@@ -105,11 +105,11 @@ export default function PaymentPackages() {
     setLoading(true);
     try {
       if (selectedPackageId === "NEW") {
-        await api.post(`/payment-packages`, formData);
-        toast.success("Payment package created successfully");
+        await api.post(`/subscription-plans`, formData);
+        toast.success("Package created successfully.");
       } else {
-        await api.put(`/payment-packages/${selectedPackageId}`, formData);
-        toast.success("Payment package updated successfully");
+        await api.put(`/subscription-plans/${selectedPackageId}`, formData);
+        toast.success("Package updated successfully.");
       }
       setSelectedPackageId("");
       fetchPackages();
@@ -134,8 +134,8 @@ export default function PaymentPackages() {
 
     setLoading(true);
     try {
-      await api.delete(`/payment-packages/${selectedPackageId}`);
-      toast.success("Payment package deleted successfully");
+      await api.delete(`/subscription-plans/${selectedPackageId}`);
+      toast.success("Package deleted successfully.");
       setSelectedPackageId("");
       fetchPackages();
     } catch (err) {

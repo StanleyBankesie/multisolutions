@@ -109,11 +109,13 @@ export default function SettingsPage() {
 
   async function loadLoginBackgroundMeta() {
     try {
-      const res = await api.get("/admin/settings/login-background/meta");
-      const hasBackground = !!res?.data?.hasBackground;
-      const version = res?.data?.updatedAt || Date.now();
-      setLoginBackgroundVersion(String(version || ""));
-      setLoginBackgroundUrl(hasBackground ? `/api/admin/settings/login-background?v=${encodeURIComponent(String(version))}` : "");
+      const res = await api.get("/admin/settings/login-bg-info");
+      if (res.data) {
+        const hasBackground = !!res?.data?.hasBackground;
+        const version = res?.data?.updatedAt || Date.now();
+        setLoginBackgroundVersion(String(version || ""));
+        setLoginBackgroundUrl(hasBackground ? `/api/admin/settings/login-background?v=${encodeURIComponent(String(version))}` : "");
+      }
     } catch {
       setLoginBackgroundUrl("");
       setLoginBackgroundVersion("");

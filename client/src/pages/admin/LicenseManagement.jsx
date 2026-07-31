@@ -135,7 +135,7 @@ export default function LicenseManagement() {
 
   const fetchPackages = async () => {
     try {
-      const res = await api.get("/payment-packages").catch(() => null);
+      const res = await api.get("/subscription-plans").catch(() => null);
       if (res && res.data && Array.isArray(res.data)) {
         setPackages(res.data.filter(p => p.status === 'ACTIVE'));
       }
